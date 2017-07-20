@@ -41,11 +41,13 @@ func NewBasicController(service *goa.Service) *BasicController {
 // Secure runs the secure action.
 func (c *BasicController) Secure(ctx *app.SecureBasicContext) error {
 	res := &app.Success{OK: true}
+	ctx.ResponseData.Header().Set("Secured", "true")
 	return ctx.OK(res)
 }
 
 // Unsecure runs the unsecure action.
 func (c *BasicController) Unsecure(ctx *app.UnsecureBasicContext) error {
 	res := &app.Success{OK: true}
+	ctx.ResponseData.Header().Set("Secured", "false")
 	return ctx.OK(res)
 }
