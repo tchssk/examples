@@ -16,7 +16,7 @@ var _ = Resource("basic", func() {
 
 	Action("secure", func() {
 		Description("This action is secure with the basic_auth scheme")
-		Routing(GET("/basic"))
+		Routing(GET("/basic/secure"))
 		Response(OK)
 		Response(Unauthorized)
 	})
