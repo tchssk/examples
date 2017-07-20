@@ -14,6 +14,14 @@ var _ = Resource("basic", func() {
 
 	Security(BasicAuth)
 
+	Action("general", func() {
+		Description("This action routes the request to secure or unsecure")
+		Routing(GET("/basic"))
+		Response(OK)
+		Response(Unauthorized)
+		Response(InternalServerError)
+	})
+
 	Action("secure", func() {
 		Description("This action is secure with the basic_auth scheme")
 		Routing(GET("/basic/secure"))

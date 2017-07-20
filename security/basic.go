@@ -13,20 +13,30 @@ import (
 func NewBasicAuthMiddleware() goa.Middleware {
 	return func(h goa.Handler) goa.Handler {
 		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+			authenticated := true
 			// Retrieve and log basic auth info
 			user, pass, ok := req.BasicAuth()
 			// A real app would do something more interesting here
 			if !ok {
-				goa.LogInfo(ctx, "failed basic auth")
-				return ErrUnauthorized("missing auth")
+				rd := goa.ContextRequest(ctx)
+				if rd.URL.Path != "/basic" {
+					goa.LogInfo(ctx, "failed basic auth")
+					return ErrUnauthorized("missing auth")
+				}
+				authenticated = false
 			}
 
 			// Proceed
 			goa.LogInfo(ctx, "basic", "user", user, "pass", pass)
+			ctx = context.WithValue(ctx, authContextKey, authenticated)
 			return h(ctx, rw, req)
 		}
 	}
 }
+
+type contextKey string
+
+const authContextKey contextKey = "Authenticated"
 
 // BasicController implements the BasicAuth resource.
 type BasicController struct {
@@ -36,6 +46,23 @@ type BasicController struct {
 // NewBasicController creates a BasicAuth controller.
 func NewBasicController(service *goa.Service) *BasicController {
 	return &BasicController{Controller: service.NewController("BasicController")}
+}
+
+// General runs the general action.
+func (c *BasicController) General(ctx *app.GeneralBasicContext) error {
+	authenticated, ok := ctx.Context.Value(authContextKey).(bool)
+	if ok && authenticated {
+		crtx, err := app.NewSecureBasicContext(ctx.Context, ctx.RequestData.Request, ctx.ResponseData.Service)
+		if err != nil {
+			return ctx.InternalServerError()
+		}
+		return c.Secure(crtx)
+	}
+	crtx, err := app.NewUnsecureBasicContext(ctx.Context, ctx.RequestData.Request, ctx.ResponseData.Service)
+	if err != nil {
+		return ctx.InternalServerError()
+	}
+	return c.Unsecure(crtx)
 }
 
 // Secure runs the secure action.
