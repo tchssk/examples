@@ -1,0 +1,77 @@
+consumes:
+- application/x-www-form-urlencoded
+definitions:
+  ResultMedia:
+    description: ResultMedia media type (default view)
+    example:
+      message: Doloremque eaque omnis dolore.
+      name: Doloremque enim quod quo veniam eveniet voluptatem.
+    properties:
+      message:
+        description: Thank you message
+        example: Doloremque eaque omnis dolore.
+        type: string
+      name:
+        description: Voter name
+        example: Doloremque enim quod quo veniam eveniet voluptatem.
+        type: string
+    required:
+    - name
+    - message
+    title: 'Mediatype identifier: application/vnd.goa.example.form; view=default'
+    type: object
+  YesNoPayload:
+    example:
+      name: Dignissimos accusamus vel id illum numquam praesentium.
+      vote: "yes"
+    properties:
+      name:
+        description: Voter name
+        example: Dignissimos accusamus vel id illum numquam praesentium.
+        type: string
+      vote:
+        description: Yes or no
+        enum:
+        - "yes"
+        - "no"
+        example: "yes"
+        type: string
+    required:
+    - name
+    - vote
+    title: YesNoPayload
+    type: object
+host: localhost:8080
+info:
+  title: A yes/no survey API demonstrating the use of x-www-form-urlencoded encoding
+    in goa
+  version: ""
+paths:
+  /survey/:
+    post:
+      description: Post accepts a form encoded request and returns a form encoded
+        response
+      operationId: survey_form#submit
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/YesNoPayload'
+      produces:
+      - application/vnd.goa.example.form
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ResultMedia'
+      schemes:
+      - http
+      summary: submit survey_form
+      tags:
+      - survey_form
+produces:
+- application/x-www-form-urlencoded
+schemes:
+- http
+swagger: "2.0"
