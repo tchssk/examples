@@ -20,27 +20,6 @@ definitions:
     - message
     title: 'Mediatype identifier: application/vnd.goa.example.form; view=default'
     type: object
-  YesNoPayload:
-    example:
-      name: Dignissimos accusamus vel id illum numquam praesentium.
-      vote: "yes"
-    properties:
-      name:
-        description: Voter name
-        example: Dignissimos accusamus vel id illum numquam praesentium.
-        type: string
-      vote:
-        description: Yes or no
-        enum:
-        - "yes"
-        - "no"
-        example: "yes"
-        type: string
-    required:
-    - name
-    - vote
-    title: YesNoPayload
-    type: object
 host: localhost:8080
 info:
   title: A yes/no survey API demonstrating the use of x-www-form-urlencoded encoding
@@ -53,11 +32,19 @@ paths:
         response
       operationId: survey_form#submit
       parameters:
-      - in: body
-        name: payload
+      - description: Voter name
+        in: formData
+        name: name
         required: true
-        schema:
-          $ref: '#/definitions/YesNoPayload'
+        type: string
+      - description: Yes or no
+        enum:
+        - "yes"
+        - "no"
+        in: formData
+        name: vote
+        required: true
+        type: string
       produces:
       - application/vnd.goa.example.form
       responses:

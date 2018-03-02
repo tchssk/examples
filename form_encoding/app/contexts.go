@@ -21,7 +21,6 @@ type SubmitSurveyFormContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Payload *YesNoPayload
 }
 
 // NewSubmitSurveyFormContext parses the incoming request URL and body, performs validations and creates the

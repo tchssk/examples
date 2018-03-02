@@ -22,7 +22,7 @@ var _ = API("survey", func() {
 var _ = Resource("survey_form", func() {
 	Action("submit", func() {
 		Routing(POST("survey/"))
-		Payload(YesNoPayload)
+		OptionalMultipart(YesNoPayload)
 		Description("Post accepts a form encoded request and returns a form encoded response")
 		Response(OK, ResultMedia)
 	})

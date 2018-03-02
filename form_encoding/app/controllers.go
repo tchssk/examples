@@ -49,29 +49,8 @@ func MountSurveyFormController(service *goa.Service, ctrl SurveyFormController) 
 		if err != nil {
 			return err
 		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*YesNoPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
 		return ctrl.Submit(rctx)
 	}
-	service.Mux.Handle("POST", "/survey/", ctrl.MuxHandler("submit", h, unmarshalSubmitSurveyFormPayload))
+	service.Mux.Handle("POST", "/survey/", ctrl.MuxHandler("submit", h, nil))
 	service.LogInfo("mount", "ctrl", "SurveyForm", "action", "Submit", "route", "POST /survey/")
-}
-
-// unmarshalSubmitSurveyFormPayload unmarshals the request body into the context request data Payload field.
-func unmarshalSubmitSurveyFormPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &yesNoPayload{}
-	if err := service.DecodeRequest(req, payload); err != nil {
-		return err
-	}
-	if err := payload.Validate(); err != nil {
-		// Initialize payload with private data structure so it can be logged
-		goa.ContextRequest(ctx).Payload = payload
-		return err
-	}
-	goa.ContextRequest(ctx).Payload = payload.Publicize()
-	return nil
 }
