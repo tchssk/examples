@@ -11,8 +11,9 @@ import (
 	"strings"
 	"sync"
 
-	multiauth "goa.design/examples/security"
-	securedservice "goa.design/examples/security/gen/secured_service"
+	multiauth "github.com/goadesign/examples/security"
+	anothersecuredservice "github.com/goadesign/examples/security/gen/another_secured_service"
+	securedservice "github.com/goadesign/examples/security/gen/secured_service"
 )
 
 func main() {
@@ -38,19 +39,23 @@ func main() {
 
 	// Initialize the services.
 	var (
-		securedServiceSvc securedservice.Service
+		securedServiceSvc        securedservice.Service
+		anotherSecuredServiceSvc anothersecuredservice.Service
 	)
 	{
 		securedServiceSvc = multiauth.NewSecuredService(logger)
+		anotherSecuredServiceSvc = multiauth.NewAnotherSecuredService(logger)
 	}
 
 	// Wrap the services in endpoints that can be invoked from other services
 	// potentially running in different processes.
 	var (
-		securedServiceEndpoints *securedservice.Endpoints
+		securedServiceEndpoints        *securedservice.Endpoints
+		anotherSecuredServiceEndpoints *anothersecuredservice.Endpoints
 	)
 	{
 		securedServiceEndpoints = securedservice.NewEndpoints(securedServiceSvc)
+		anotherSecuredServiceEndpoints = anothersecuredservice.NewEndpoints(anotherSecuredServiceSvc)
 	}
 
 	// Create channel used by both the signal handler and server goroutines
@@ -90,7 +95,7 @@ func main() {
 			} else if u.Port() == "" {
 				u.Host += ":80"
 			}
-			handleHTTPServer(ctx, u, securedServiceEndpoints, &wg, errc, logger, *dbgF)
+			handleHTTPServer(ctx, u, securedServiceEndpoints, anotherSecuredServiceEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 		{
@@ -112,7 +117,7 @@ func main() {
 			} else if u.Port() == "" {
 				u.Host += ":8080"
 			}
-			handleGRPCServer(ctx, u, securedServiceEndpoints, &wg, errc, logger, *dbgF)
+			handleGRPCServer(ctx, u, securedServiceEndpoints, anotherSecuredServiceEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 	default:

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	cli "goa.design/examples/security/gen/http/cli/multi_auth"
+	cli "github.com/goadesign/examples/security/gen/http/cli/multi_auth"
 	"goa.design/goa"
 	goahttp "goa.design/goa/http"
 )

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	cli "goa.design/examples/security/gen/grpc/cli/multi_auth"
+	cli "github.com/goadesign/examples/security/gen/grpc/cli/multi_auth"
 	"goa.design/goa"
 	"google.golang.org/grpc"
 )

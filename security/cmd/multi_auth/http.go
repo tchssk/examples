@@ -9,8 +9,10 @@ import (
 	"sync"
 	"time"
 
-	securedservicesvr "goa.design/examples/security/gen/http/secured_service/server"
-	securedservice "goa.design/examples/security/gen/secured_service"
+	anothersecuredservice "github.com/goadesign/examples/security/gen/another_secured_service"
+	anothersecuredservicesvr "github.com/goadesign/examples/security/gen/http/another_secured_service/server"
+	securedservicesvr "github.com/goadesign/examples/security/gen/http/secured_service/server"
+	securedservice "github.com/goadesign/examples/security/gen/secured_service"
 	goahttp "goa.design/goa/http"
 	httpmdlwr "goa.design/goa/http/middleware"
 	"goa.design/goa/middleware"
@@ -18,7 +20,7 @@ import (
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, securedServiceEndpoints *securedservice.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleHTTPServer(ctx context.Context, u *url.URL, securedServiceEndpoints *securedservice.Endpoints, anotherSecuredServiceEndpoints *anothersecuredservice.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -49,14 +51,17 @@ func handleHTTPServer(ctx context.Context, u *url.URL, securedServiceEndpoints *
 	// the service input and output data structures to HTTP requests and
 	// responses.
 	var (
-		securedServiceServer *securedservicesvr.Server
+		securedServiceServer        *securedservicesvr.Server
+		anotherSecuredServiceServer *anothersecuredservicesvr.Server
 	)
 	{
 		eh := errorHandler(logger)
 		securedServiceServer = securedservicesvr.New(securedServiceEndpoints, mux, dec, enc, eh)
+		anotherSecuredServiceServer = anothersecuredservicesvr.New(anotherSecuredServiceEndpoints, mux, dec, enc, eh)
 	}
 	// Configure the mux.
 	securedservicesvr.Mount(mux, securedServiceServer)
+	anothersecuredservicesvr.Mount(mux, anotherSecuredServiceServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted
 	// here apply to all the service endpoints.
@@ -73,6 +78,9 @@ func handleHTTPServer(ctx context.Context, u *url.URL, securedServiceEndpoints *
 	// configure the server as required by your service.
 	srv := &http.Server{Addr: u.Host, Handler: handler}
 	for _, m := range securedServiceServer.Mounts {
+		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
+	}
+	for _, m := range anotherSecuredServiceServer.Mounts {
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 
