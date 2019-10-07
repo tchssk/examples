@@ -1,19 +1,19 @@
 // Code generated with goa v2.0.5, DO NOT EDIT.
 //
-// secured_service protocol buffer definition
+// another_secured_service protocol buffer definition
 //
 // Command:
 // $ goa gen github.com/goadesign/examples/security/design
 
 syntax = "proto3";
 
-package secured_service;
+package another_secured_service;
 
-option go_package = "secured_servicepb";
+option go_package = "another_secured_servicepb";
 
-// The secured service exposes endpoints that require valid authorization
-// credentials.
-service SecuredService {
+// The another secured service exposes endpoints that require valid
+// authorization credentials.
+service AnotherSecuredService {
 	// Creates a valid JWT
 	rpc Signin (SigninRequest) returns (SigninResponse);
 	// This action is secured with the jwt scheme

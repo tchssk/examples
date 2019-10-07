@@ -3,8 +3,7 @@
 // secured_service HTTP client CLI support package
 //
 // Command:
-// $ goa gen goa.design/examples/security/design -o
-// $(GOPATH)/src/goa.design/examples/security
+// $ goa gen github.com/goadesign/examples/security/design
 
 package client
 
@@ -12,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	securedservice "goa.design/examples/security/gen/secured_service"
+	securedservice "github.com/goadesign/examples/security/gen/secured_service"
 )
 
 // BuildSigninPayload builds the payload for the secured_service signin

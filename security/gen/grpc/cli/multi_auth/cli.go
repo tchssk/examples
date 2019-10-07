@@ -3,8 +3,7 @@
 // multi_auth gRPC client CLI support package
 //
 // Command:
-// $ goa gen goa.design/examples/security/design -o
-// $(GOPATH)/src/goa.design/examples/security
+// $ goa gen github.com/goadesign/examples/security/design
 
 package cli
 
@@ -13,7 +12,8 @@ import (
 	"fmt"
 	"os"
 
-	securedservicec "goa.design/examples/security/gen/grpc/secured_service/client"
+	anothersecuredservicec "github.com/goadesign/examples/security/gen/grpc/another_secured_service/client"
+	securedservicec "github.com/goadesign/examples/security/gen/grpc/secured_service/client"
 	goa "goa.design/goa"
 	grpc "google.golang.org/grpc"
 )
@@ -24,12 +24,14 @@ import (
 //
 func UsageCommands() string {
 	return `secured-service (signin|secure|doubly-secure|also-doubly-secure)
+another-secured-service (signin|secure|doubly-secure|also-doubly-secure)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
 	return os.Args[0] + ` secured-service signin --username "user" --password "password"` + "\n" +
+		os.Args[0] + ` another-secured-service signin --username "user" --password "password"` + "\n" +
 		""
 }
 
@@ -55,12 +57,37 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 		securedServiceAlsoDoublySecureMessageFlag    = securedServiceAlsoDoublySecureFlags.String("message", "", "")
 		securedServiceAlsoDoublySecureOauthTokenFlag = securedServiceAlsoDoublySecureFlags.String("oauth-token", "", "")
 		securedServiceAlsoDoublySecureTokenFlag      = securedServiceAlsoDoublySecureFlags.String("token", "", "")
+
+		anotherSecuredServiceFlags = flag.NewFlagSet("another-secured-service", flag.ContinueOnError)
+
+		anotherSecuredServiceSigninFlags        = flag.NewFlagSet("signin", flag.ExitOnError)
+		anotherSecuredServiceSigninUsernameFlag = anotherSecuredServiceSigninFlags.String("username", "REQUIRED", "")
+		anotherSecuredServiceSigninPasswordFlag = anotherSecuredServiceSigninFlags.String("password", "REQUIRED", "")
+
+		anotherSecuredServiceSecureFlags       = flag.NewFlagSet("secure", flag.ExitOnError)
+		anotherSecuredServiceSecureMessageFlag = anotherSecuredServiceSecureFlags.String("message", "", "")
+		anotherSecuredServiceSecureTokenFlag   = anotherSecuredServiceSecureFlags.String("token", "REQUIRED", "")
+
+		anotherSecuredServiceDoublySecureFlags       = flag.NewFlagSet("doubly-secure", flag.ExitOnError)
+		anotherSecuredServiceDoublySecureMessageFlag = anotherSecuredServiceDoublySecureFlags.String("message", "", "")
+		anotherSecuredServiceDoublySecureTokenFlag   = anotherSecuredServiceDoublySecureFlags.String("token", "REQUIRED", "")
+
+		anotherSecuredServiceAlsoDoublySecureFlags          = flag.NewFlagSet("also-doubly-secure", flag.ExitOnError)
+		anotherSecuredServiceAlsoDoublySecureMessageFlag    = anotherSecuredServiceAlsoDoublySecureFlags.String("message", "", "")
+		anotherSecuredServiceAlsoDoublySecureOauthTokenFlag = anotherSecuredServiceAlsoDoublySecureFlags.String("oauth-token", "", "")
+		anotherSecuredServiceAlsoDoublySecureTokenFlag      = anotherSecuredServiceAlsoDoublySecureFlags.String("token", "", "")
 	)
 	securedServiceFlags.Usage = securedServiceUsage
 	securedServiceSigninFlags.Usage = securedServiceSigninUsage
 	securedServiceSecureFlags.Usage = securedServiceSecureUsage
 	securedServiceDoublySecureFlags.Usage = securedServiceDoublySecureUsage
 	securedServiceAlsoDoublySecureFlags.Usage = securedServiceAlsoDoublySecureUsage
+
+	anotherSecuredServiceFlags.Usage = anotherSecuredServiceUsage
+	anotherSecuredServiceSigninFlags.Usage = anotherSecuredServiceSigninUsage
+	anotherSecuredServiceSecureFlags.Usage = anotherSecuredServiceSecureUsage
+	anotherSecuredServiceDoublySecureFlags.Usage = anotherSecuredServiceDoublySecureUsage
+	anotherSecuredServiceAlsoDoublySecureFlags.Usage = anotherSecuredServiceAlsoDoublySecureUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -79,6 +106,8 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 		switch svcn {
 		case "secured-service":
 			svcf = securedServiceFlags
+		case "another-secured-service":
+			svcf = anotherSecuredServiceFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -107,6 +136,22 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 
 			case "also-doubly-secure":
 				epf = securedServiceAlsoDoublySecureFlags
+
+			}
+
+		case "another-secured-service":
+			switch epn {
+			case "signin":
+				epf = anotherSecuredServiceSigninFlags
+
+			case "secure":
+				epf = anotherSecuredServiceSecureFlags
+
+			case "doubly-secure":
+				epf = anotherSecuredServiceDoublySecureFlags
+
+			case "also-doubly-secure":
+				epf = anotherSecuredServiceAlsoDoublySecureFlags
 
 			}
 
@@ -145,6 +190,22 @@ func ParseEndpoint(cc *grpc.ClientConn, opts ...grpc.CallOption) (goa.Endpoint, 
 			case "also-doubly-secure":
 				endpoint = c.AlsoDoublySecure()
 				data, err = securedservicec.BuildAlsoDoublySecurePayload(*securedServiceAlsoDoublySecureMessageFlag, *securedServiceAlsoDoublySecureOauthTokenFlag, *securedServiceAlsoDoublySecureTokenFlag)
+			}
+		case "another-secured-service":
+			c := anothersecuredservicec.NewClient(cc, opts...)
+			switch epn {
+			case "signin":
+				endpoint = c.Signin()
+				data, err = anothersecuredservicec.BuildSigninPayload(*anotherSecuredServiceSigninUsernameFlag, *anotherSecuredServiceSigninPasswordFlag)
+			case "secure":
+				endpoint = c.Secure()
+				data, err = anothersecuredservicec.BuildSecurePayload(*anotherSecuredServiceSecureMessageFlag, *anotherSecuredServiceSecureTokenFlag)
+			case "doubly-secure":
+				endpoint = c.DoublySecure()
+				data, err = anothersecuredservicec.BuildDoublySecurePayload(*anotherSecuredServiceDoublySecureMessageFlag, *anotherSecuredServiceDoublySecureTokenFlag)
+			case "also-doubly-secure":
+				endpoint = c.AlsoDoublySecure()
+				data, err = anothersecuredservicec.BuildAlsoDoublySecurePayload(*anotherSecuredServiceAlsoDoublySecureMessageFlag, *anotherSecuredServiceAlsoDoublySecureOauthTokenFlag, *anotherSecuredServiceAlsoDoublySecureTokenFlag)
 			}
 		}
 	}
@@ -194,7 +255,7 @@ This action is secured with the jwt scheme
 Example:
     `+os.Args[0]+` secured-service secure --message '{
       "fail": true
-   }' --token "Fugit autem in."
+   }' --token "Consequatur qui eligendi ut similique ut."
 `, os.Args[0])
 }
 
@@ -225,6 +286,80 @@ Example:
       "key": "abcdef12345",
       "password": "password",
       "username": "user"
-   }' --oauth-token "In et sit sunt ut." --token "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+   }' --oauth-token "Quos ut est ipsum consequatur fugiat at." --token "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+`, os.Args[0])
+}
+
+// another-secured-serviceUsage displays the usage of the
+// another-secured-service command and its subcommands.
+func anotherSecuredServiceUsage() {
+	fmt.Fprintf(os.Stderr, `The another secured service exposes endpoints that require valid authorization credentials.
+Usage:
+    %s [globalflags] another-secured-service COMMAND [flags]
+
+COMMAND:
+    signin: Creates a valid JWT
+    secure: This action is secured with the jwt scheme
+    doubly-secure: This action is secured with the jwt scheme and also requires an API key query string.
+    also-doubly-secure: This action is secured with the jwt scheme and also requires an API key header.
+
+Additional help:
+    %s another-secured-service COMMAND --help
+`, os.Args[0], os.Args[0])
+}
+func anotherSecuredServiceSigninUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] another-secured-service signin -username STRING -password STRING
+
+Creates a valid JWT
+    -username STRING: 
+    -password STRING: 
+
+Example:
+    `+os.Args[0]+` another-secured-service signin --username "user" --password "password"
+`, os.Args[0])
+}
+
+func anotherSecuredServiceSecureUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] another-secured-service secure -message JSON -token STRING
+
+This action is secured with the jwt scheme
+    -message JSON: 
+    -token STRING: 
+
+Example:
+    `+os.Args[0]+` another-secured-service secure --message '{
+      "fail": true
+   }' --token "Tenetur et eaque nesciunt."
+`, os.Args[0])
+}
+
+func anotherSecuredServiceDoublySecureUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] another-secured-service doubly-secure -message JSON -token STRING
+
+This action is secured with the jwt scheme and also requires an API key query string.
+    -message JSON: 
+    -token STRING: 
+
+Example:
+    `+os.Args[0]+` another-secured-service doubly-secure --message '{
+      "key": "abcdef12345"
+   }' --token "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+`, os.Args[0])
+}
+
+func anotherSecuredServiceAlsoDoublySecureUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] another-secured-service also-doubly-secure -message JSON -oauth-token STRING -token STRING
+
+This action is secured with the jwt scheme and also requires an API key header.
+    -message JSON: 
+    -oauth-token STRING: 
+    -token STRING: 
+
+Example:
+    `+os.Args[0]+` another-secured-service also-doubly-secure --message '{
+      "key": "abcdef12345",
+      "password": "password",
+      "username": "user"
+   }' --oauth-token "Sed ipsam at hic optio dolores aut." --token "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
 `, os.Args[0])
 }

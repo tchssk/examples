@@ -3,13 +3,12 @@
 // secured_service HTTP client types
 //
 // Command:
-// $ goa gen goa.design/examples/security/design -o
-// $(GOPATH)/src/goa.design/examples/security
+// $ goa gen github.com/goadesign/examples/security/design
 
 package client
 
 import (
-	securedservice "goa.design/examples/security/gen/secured_service"
+	securedservice "github.com/goadesign/examples/security/gen/secured_service"
 	goa "goa.design/goa"
 )
 

@@ -3,13 +3,12 @@
 // secured_service HTTP server types
 //
 // Command:
-// $ goa gen goa.design/examples/security/design -o
-// $(GOPATH)/src/goa.design/examples/security
+// $ goa gen github.com/goadesign/examples/security/design
 
 package server
 
 import (
-	securedservice "goa.design/examples/security/gen/secured_service"
+	securedservice "github.com/goadesign/examples/security/gen/secured_service"
 )
 
 // SigninResponseBody is the type of the "secured_service" service "signin"

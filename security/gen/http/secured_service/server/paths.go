@@ -3,8 +3,7 @@
 // HTTP request path constructors for the secured_service service.
 //
 // Command:
-// $ goa gen goa.design/examples/security/design -o
-// $(GOPATH)/src/goa.design/examples/security
+// $ goa gen github.com/goadesign/examples/security/design
 
 package server
 

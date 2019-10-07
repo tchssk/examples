@@ -3,14 +3,13 @@
 // secured_service gRPC client types
 //
 // Command:
-// $ goa gen goa.design/examples/security/design -o
-// $(GOPATH)/src/goa.design/examples/security
+// $ goa gen github.com/goadesign/examples/security/design
 
 package client
 
 import (
-	secured_servicepb "goa.design/examples/security/gen/grpc/secured_service/pb"
-	securedservice "goa.design/examples/security/gen/secured_service"
+	secured_servicepb "github.com/goadesign/examples/security/gen/grpc/secured_service/pb"
+	securedservice "github.com/goadesign/examples/security/gen/secured_service"
 )
 
 // NewSigninRequest builds the gRPC request type from the payload of the

@@ -3,8 +3,7 @@
 // secured_service gRPC client CLI support package
 //
 // Command:
-// $ goa gen goa.design/examples/security/design -o
-// $(GOPATH)/src/goa.design/examples/security
+// $ goa gen github.com/goadesign/examples/security/design
 
 package client
 
@@ -12,8 +11,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	secured_servicepb "goa.design/examples/security/gen/grpc/secured_service/pb"
-	securedservice "goa.design/examples/security/gen/secured_service"
+	secured_servicepb "github.com/goadesign/examples/security/gen/grpc/secured_service/pb"
+	securedservice "github.com/goadesign/examples/security/gen/secured_service"
 )
 
 // BuildSigninPayload builds the payload for the secured_service signin
