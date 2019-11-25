@@ -68,7 +68,7 @@ var _ = Service("calc", func() {
 		HTTP(func() {
 			// Requests to the service consist of HTTP GET requests.
 			// The payload fields are encoded as path parameters.
-			GET("/add/{a}/{b}")
+			GET("/add")
 			// Responses use a "200 OK" HTTP status.
 			// The result is encoded in the response body.
 			Response(StatusOK)

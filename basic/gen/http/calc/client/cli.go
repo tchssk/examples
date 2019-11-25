@@ -8,36 +8,25 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
-	"strconv"
 
 	calc "goa.design/examples/basic/gen/calc"
 )
 
 // BuildAddPayload builds the payload for the calc add endpoint from CLI flags.
-func BuildAddPayload(calcAddA string, calcAddB string) (*calc.AddPayload, error) {
+func BuildAddPayload(calcAddBody string) (*calc.AddPayload, error) {
 	var err error
-	var a int
+	var body AddRequestBody
 	{
-		var v int64
-		v, err = strconv.ParseInt(calcAddA, 10, 64)
-		a = int(v)
+		err = json.Unmarshal([]byte(calcAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid value for a, must be INT")
+			return nil, fmt.Errorf("invalid JSON for body, example of valid JSON:\n%s", "'{\n      \"a\": 546803495890724710,\n      \"b\": 7837387407375911615\n   }'")
 		}
 	}
-	var b int
-	{
-		var v int64
-		v, err = strconv.ParseInt(calcAddB, 10, 64)
-		b = int(v)
-		if err != nil {
-			return nil, fmt.Errorf("invalid value for b, must be INT")
-		}
+	v := &calc.AddPayload{
+		A: body.A,
+		B: body.B,
 	}
-	payload := &calc.AddPayload{
-		A: a,
-		B: b,
-	}
-	return payload, nil
+	return v, nil
 }

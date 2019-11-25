@@ -29,7 +29,10 @@ func UsageCommands() string {
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` calc add --a 5952269320165453119 --b 1828520165265779840` + "\n" +
+	return os.Args[0] + ` calc add --body '{
+      "a": 546803495890724710,
+      "b": 7837387407375911615
+   }'` + "\n" +
 		""
 }
 
@@ -45,9 +48,8 @@ func ParseEndpoint(
 	var (
 		calcFlags = flag.NewFlagSet("calc", flag.ContinueOnError)
 
-		calcAddFlags = flag.NewFlagSet("add", flag.ExitOnError)
-		calcAddAFlag = calcAddFlags.String("a", "REQUIRED", "Left operand")
-		calcAddBFlag = calcAddFlags.String("b", "REQUIRED", "Right operand")
+		calcAddFlags    = flag.NewFlagSet("add", flag.ExitOnError)
+		calcAddBodyFlag = calcAddFlags.String("body", "REQUIRED", "")
 	)
 	calcFlags.Usage = calcUsage
 	calcAddFlags.Usage = calcAddUsage
@@ -116,7 +118,7 @@ func ParseEndpoint(
 			switch epn {
 			case "add":
 				endpoint = c.Add()
-				data, err = calcc.BuildAddPayload(*calcAddAFlag, *calcAddBFlag)
+				data, err = calcc.BuildAddPayload(*calcAddBodyFlag)
 			}
 		}
 	}
@@ -141,13 +143,15 @@ Additional help:
 `, os.Args[0], os.Args[0])
 }
 func calcAddUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] calc add -a INT -b INT
+	fmt.Fprintf(os.Stderr, `%s [flags] calc add -body JSON
 
 Add implements add.
-    -a INT: Left operand
-    -b INT: Right operand
+    -body JSON: 
 
 Example:
-    `+os.Args[0]+` calc add --a 5952269320165453119 --b 1828520165265779840
+    `+os.Args[0]+` calc add --body '{
+      "a": 546803495890724710,
+      "b": 7837387407375911615
+   }'
 `, os.Args[0])
 }

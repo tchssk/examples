@@ -9,8 +9,8 @@ package server
 
 import (
 	"context"
+	"io"
 	"net/http"
-	"strconv"
 
 	goa "goa.design/goa"
 	goahttp "goa.design/goa/http"
@@ -33,32 +33,21 @@ func EncodeAddResponse(encoder func(context.Context, http.ResponseWriter) goahtt
 func DecodeAddRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			a   int
-			b   int
-			err error
-
-			params = mux.Vars(r)
+			body AddRequestBody
+			err  error
 		)
-		{
-			aRaw := params["a"]
-			v, err2 := strconv.ParseInt(aRaw, 10, strconv.IntSize)
-			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("a", aRaw, "integer"))
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
 			}
-			a = int(v)
+			return nil, goa.DecodePayloadError(err.Error())
 		}
-		{
-			bRaw := params["b"]
-			v, err2 := strconv.ParseInt(bRaw, 10, strconv.IntSize)
-			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("b", bRaw, "integer"))
-			}
-			b = int(v)
-		}
+		err = ValidateAddRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewAddPayload(a, b)
+		payload := NewAddPayload(&body)
 
 		return payload, nil
 	}

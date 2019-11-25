@@ -6,3 +6,26 @@
 // $ goa gen goa.design/examples/basic/design
 
 package client
+
+import (
+	calc "goa.design/examples/basic/gen/calc"
+)
+
+// AddRequestBody is the type of the "calc" service "add" endpoint HTTP request
+// body.
+type AddRequestBody struct {
+	// Left operand
+	A int `form:"a" json:"a" xml:"a"`
+	// Right operand
+	B int `form:"b" json:"b" xml:"b"`
+}
+
+// NewAddRequestBody builds the HTTP request body from the payload of the "add"
+// endpoint of the "calc" service.
+func NewAddRequestBody(p *calc.AddPayload) *AddRequestBody {
+	body := &AddRequestBody{
+		A: p.A,
+		B: p.B,
+	}
+	return body
+}

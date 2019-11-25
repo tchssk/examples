@@ -21,19 +21,7 @@ import (
 // BuildAddRequest instantiates a HTTP request object with method and path set
 // to call the "calc" service "add" endpoint
 func (c *Client) BuildAddRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	var (
-		a int
-		b int
-	)
-	{
-		p, ok := v.(*calc.AddPayload)
-		if !ok {
-			return nil, goahttp.ErrInvalidType("calc", "add", "*calc.AddPayload", v)
-		}
-		a = p.A
-		b = p.B
-	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AddCalcPath(a, b)}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AddCalcPath()}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("calc", "add", u.String(), err)
@@ -43,6 +31,21 @@ func (c *Client) BuildAddRequest(ctx context.Context, v interface{}) (*http.Requ
 	}
 
 	return req, nil
+}
+
+// EncodeAddRequest returns an encoder for requests sent to the calc add server.
+func EncodeAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*calc.AddPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("calc", "add", "*calc.AddPayload", v)
+		}
+		body := NewAddRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("calc", "add", err)
+		}
+		return nil
+	}
 }
 
 // DecodeAddResponse returns a decoder for responses returned by the calc add

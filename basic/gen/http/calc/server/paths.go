@@ -7,11 +7,7 @@
 
 package server
 
-import (
-	"fmt"
-)
-
 // AddCalcPath returns the URL path to the calc service add HTTP endpoint.
-func AddCalcPath(a int, b int) string {
-	return fmt.Sprintf("/add/%v/%v", a, b)
+func AddCalcPath() string {
+	return "/add"
 }
