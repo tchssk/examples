@@ -25,9 +25,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/CalcAddRequestBody'
-          required:
-          - a
-          - b
       responses:
         "200":
           description: OK response.
@@ -68,6 +65,3 @@ definitions:
     example:
       a: 8803302123552712831
       b: 5401762099778430809
-    required:
-    - a
-    - b

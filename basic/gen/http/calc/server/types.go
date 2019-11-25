@@ -9,7 +9,6 @@ package server
 
 import (
 	calc "goa.design/examples/basic/gen/calc"
-	goa "goa.design/goa"
 )
 
 // AddRequestBody is the type of the "calc" service "add" endpoint HTTP request
@@ -24,19 +23,8 @@ type AddRequestBody struct {
 // NewAddPayload builds a calc service add endpoint payload.
 func NewAddPayload(body *AddRequestBody) *calc.AddPayload {
 	v := &calc.AddPayload{
-		A: *body.A,
-		B: *body.B,
+		A: body.A,
+		B: body.B,
 	}
 	return v
-}
-
-// ValidateAddRequestBody runs the validations defined on AddRequestBody
-func ValidateAddRequestBody(body *AddRequestBody) (err error) {
-	if body.A == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("a", "body"))
-	}
-	if body.B == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("b", "body"))
-	}
-	return
 }

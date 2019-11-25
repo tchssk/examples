@@ -15,9 +15,9 @@ import (
 // body.
 type AddRequestBody struct {
 	// Left operand
-	A int `form:"a" json:"a" xml:"a"`
+	A *int `form:"a,omitempty" json:"a,omitempty" xml:"a,omitempty"`
 	// Right operand
-	B int `form:"b" json:"b" xml:"b"`
+	B *int `form:"b,omitempty" json:"b,omitempty" xml:"b,omitempty"`
 }
 
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"

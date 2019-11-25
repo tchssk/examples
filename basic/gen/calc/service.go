@@ -30,7 +30,7 @@ var MethodNames = [1]string{"add"}
 // AddPayload is the payload type of the calc service add method.
 type AddPayload struct {
 	// Left operand
-	A int
+	A *int
 	// Right operand
-	B int
+	B *int
 }

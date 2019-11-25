@@ -57,7 +57,6 @@ var _ = Service("calc", func() {
 				Meta("rpc:tag", "1")
 			})
 			Field(2, "b", Int, "Right operand")
-			Required("a", "b")
 		})
 
 		// Result describes the method result.

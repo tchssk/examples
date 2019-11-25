@@ -43,10 +43,6 @@ func DecodeAddRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Dec
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
-		err = ValidateAddRequestBody(&body)
-		if err != nil {
-			return nil, err
-		}
 		payload := NewAddPayload(&body)
 
 		return payload, nil
