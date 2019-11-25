@@ -1,8 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
+	"encoding/json"
+	"encoding/xml"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"net/url"
 	"os"
@@ -33,7 +41,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, calcEndpoints *calc.Endpo
 	// Other encodings can be used by providing the corresponding functions,
 	// see goa.design/encoding.
 	var (
-		dec = goahttp.RequestDecoder
+		dec = RequestDecoder
 		enc = goahttp.ResponseEncoder
 	)
 
@@ -106,4 +114,60 @@ func errorHandler(logger *log.Logger) func(context.Context, http.ResponseWriter,
 		w.Write([]byte("[" + id + "] encoding: " + err.Error()))
 		logger.Printf("[%s] ERROR: %s", id, err.Error())
 	}
+}
+
+func RequestDecoder(r *http.Request) goahttp.Decoder {
+	contentType := r.Header.Get("Content-Type")
+	if contentType == "" {
+		// default to JSON
+		contentType = "application/json"
+	} else {
+		// sanitize
+		if mediaType, _, err := mime.ParseMediaType(contentType); err == nil {
+			contentType = mediaType
+		}
+	}
+	switch contentType {
+	case "application/json":
+		var body io.Reader = r.Body
+		if r.ContentLength == 0 {
+			body = bytes.NewBufferString("{}")
+		}
+		return json.NewDecoder(body)
+	case "application/gob":
+		return gob.NewDecoder(r.Body)
+	case "application/xml":
+		return xml.NewDecoder(r.Body)
+	case "text/html", "text/plain":
+		return newTextDecoder(r.Body, contentType)
+	default:
+		return json.NewDecoder(r.Body)
+	}
+}
+
+func newTextDecoder(r io.Reader, ct string) goahttp.Decoder {
+	return &textDecoder{r, ct}
+}
+
+type textDecoder struct {
+	r  io.Reader
+	ct string
+}
+
+func (e *textDecoder) Decode(v interface{}) error {
+	b, err := ioutil.ReadAll(e.r)
+	if err != nil {
+		return err
+	}
+
+	switch c := v.(type) {
+	case *string:
+		*c = string(b)
+	case *[]byte:
+		*c = b
+	default:
+		err = fmt.Errorf("can't decode %s to %T", e.ct, c)
+	}
+
+	return err
 }
