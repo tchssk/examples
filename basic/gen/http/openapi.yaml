@@ -36,6 +36,10 @@ paths:
           schema:
             type: integer
             format: int64
+        "202":
+          description: Accepted response.
+          schema:
+            $ref: '#/definitions/CalcAddAcceptedResponseBody'
       schemes:
       - http
   /swagger.json:
@@ -52,3 +56,9 @@ paths:
       schemes:
       - http
       - https
+definitions:
+  CalcAddAcceptedResponseBody:
+    title: CalcAddAcceptedResponseBody
+    type: integer
+    example: 1918630006328122782
+    format: int64

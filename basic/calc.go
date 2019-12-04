@@ -20,5 +20,8 @@ func NewCalc(logger *log.Logger) calcsvc.Service {
 
 // Add implements add.
 func (s *calcSvc) Add(ctx context.Context, p *calcsvc.AddPayload) (int, error) {
+	if p.A == 1 {
+		return 0, calcsvc.Accepted(1)
+	}
 	return p.A + p.B, nil
 }

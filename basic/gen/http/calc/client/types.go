@@ -7,3 +7,17 @@
 // $(GOPATH)/src/goa.design/examples/basic
 
 package client
+
+import (
+	calc "goa.design/examples/basic/gen/calc"
+)
+
+// AddAcceptedResponseBody is the type of the "calc" service "add" endpoint
+// HTTP response body for the "accepted" error.
+type AddAcceptedResponseBody int
+
+// NewAddAccepted builds a calc service add endpoint accepted error.
+func NewAddAccepted(body AddAcceptedResponseBody) calc.Accepted {
+	v := calc.Accepted(body)
+	return v
+}

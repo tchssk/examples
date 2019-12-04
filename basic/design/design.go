@@ -63,6 +63,7 @@ var _ = Service("calc", func() {
 		// Result describes the method result.
 		// Here the result is a simple integer value.
 		Result(Int)
+		Error("accepted", Int)
 
 		// HTTP describes the HTTP transport mapping.
 		HTTP(func() {
@@ -72,6 +73,7 @@ var _ = Service("calc", func() {
 			// Responses use a "200 OK" HTTP status.
 			// The result is encoded in the response body.
 			Response(StatusOK)
+			Response("accepted", StatusAccepted)
 		})
 
 		// GRPC describes the gRPC transport mapping.

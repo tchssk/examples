@@ -12,6 +12,17 @@ import (
 	calc "goa.design/examples/basic/gen/calc"
 )
 
+// AddAcceptedResponseBody is the type of the "calc" service "add" endpoint
+// HTTP response body for the "accepted" error.
+type AddAcceptedResponseBody int
+
+// NewAddAcceptedResponseBody builds the HTTP response body from the result of
+// the "add" endpoint of the "calc" service.
+func NewAddAcceptedResponseBody(res calc.Accepted) AddAcceptedResponseBody {
+	body := AddAcceptedResponseBody(res)
+	return body
+}
+
 // NewAddPayload builds a calc service add endpoint payload.
 func NewAddPayload(a int, b int) *calc.AddPayload {
 	return &calc.AddPayload{

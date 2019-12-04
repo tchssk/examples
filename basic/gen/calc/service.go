@@ -35,3 +35,15 @@ type AddPayload struct {
 	// Right operand
 	B int
 }
+
+type Accepted int
+
+// Error returns an error description.
+func (e Accepted) Error() string {
+	return ""
+}
+
+// ErrorName returns "accepted".
+func (e Accepted) ErrorName() string {
+	return "accepted"
+}

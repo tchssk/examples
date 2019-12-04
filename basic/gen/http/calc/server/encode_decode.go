@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"strconv"
 
+	calc "goa.design/examples/basic/gen/calc"
 	goa "goa.design/goa"
 	goahttp "goa.design/goa/http"
 )
@@ -62,5 +63,28 @@ func DecodeAddRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Dec
 		payload := NewAddPayload(a, b)
 
 		return payload, nil
+	}
+}
+
+// EncodeAddError returns an encoder for errors returned by the add calc
+// endpoint.
+func EncodeAddError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "accepted":
+			res := v.(calc.Accepted)
+			enc := encoder(ctx, w)
+			body := NewAddAcceptedResponseBody(res)
+			w.Header().Set("goa-error", "accepted")
+			w.WriteHeader(http.StatusAccepted)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
 	}
 }
