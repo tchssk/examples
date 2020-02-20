@@ -65,3 +65,9 @@ func (ctx *AddOperandsContext) OK(resp []byte) error {
 	_, err := ctx.ResponseData.Write(resp)
 	return err
 }
+
+// TooManyRequests sends a HTTP response with status code 429.
+func (ctx *AddOperandsContext) TooManyRequests() error {
+	ctx.ResponseData.WriteHeader(429)
+	return nil
+}

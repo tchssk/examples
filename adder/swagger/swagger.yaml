@@ -30,6 +30,7 @@ paths:
       responses:
         "200":
           description: OK
+        "429": {}
       schemes:
       - http
       summary: add operands

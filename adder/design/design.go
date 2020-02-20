@@ -5,6 +5,10 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+const (
+	TooManyRequests = "TooManyRequests"
+)
+
 var _ = API("adder", func() {
 	Title("The adder API")
 	Description("A teaser for goa")
@@ -21,6 +25,9 @@ var _ = Resource("operands", func() {
 			Param("right", Integer, "Right operand")
 		})
 		Response(OK, "text/plain")
+		Response(TooManyRequests, func() {
+			Status(429)
+		})
 	})
 
 })
