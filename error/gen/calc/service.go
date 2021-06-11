@@ -10,8 +10,6 @@ package calc
 
 import (
 	"context"
-
-	goa "goa.design/goa/v3/pkg"
 )
 
 // Service is the calc service interface.
@@ -38,11 +36,14 @@ type DivPayload struct {
 	B int
 }
 
-// MakeDivByZero builds a goa.ServiceError from an error.
-func MakeDivByZero(err error) *goa.ServiceError {
-	return &goa.ServiceError{
-		Name:    "DivByZero",
-		ID:      goa.NewErrorID(),
-		Message: err.Error(),
-	}
+type DivByZero string
+
+// Error returns an error description.
+func (e DivByZero) Error() string {
+	return ""
+}
+
+// ErrorName returns "DivByZero".
+func (e DivByZero) ErrorName() string {
+	return "DivByZero"
 }

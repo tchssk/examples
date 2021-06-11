@@ -28,7 +28,7 @@ func NewClient(div goa.Endpoint) *Client {
 
 // Div calls the "div" endpoint of the "calc" service.
 // Div may return the following errors:
-//	- "DivByZero" (type *goa.ServiceError)
+//	- "DivByZero" (type DivByZero)
 //	- error: internal error
 func (c *Client) Div(ctx context.Context, p *DivPayload) (res int, err error) {
 	var ires interface{}

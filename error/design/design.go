@@ -13,7 +13,7 @@ var _ = API("calc", func() {
 
 var _ = Service("calc", func() {
 	Method("div", func() {
-		Error("DivByZero")
+		Error("DivByZero", String)
 		Payload(func() {
 			Field(1, "a", Int, "Left operand")
 			Field(2, "b", Int, "Right operand")
