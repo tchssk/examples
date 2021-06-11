@@ -12,6 +12,17 @@ import (
 	calc "goa.design/examples/error/gen/calc"
 )
 
+// DivDivByZeroResponseBody is the type of the "calc" service "div" endpoint
+// HTTP response body for the "DivByZero" error.
+type DivDivByZeroResponseBody string
+
+// NewDivDivByZeroResponseBody builds the HTTP response body from the result of
+// the "div" endpoint of the "calc" service.
+func NewDivDivByZeroResponseBody(res calc.DivByZero) DivDivByZeroResponseBody {
+	body := DivDivByZeroResponseBody(res)
+	return body
+}
+
 // NewDivPayload builds a calc service div endpoint payload.
 func NewDivPayload(a int, b int) *calc.DivPayload {
 	v := &calc.DivPayload{}

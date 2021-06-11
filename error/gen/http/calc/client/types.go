@@ -7,3 +7,18 @@
 // $(GOPATH)/src/goa.design/examples/error
 
 package client
+
+import (
+	calc "goa.design/examples/error/gen/calc"
+)
+
+// DivDivByZeroResponseBody is the type of the "calc" service "div" endpoint
+// HTTP response body for the "DivByZero" error.
+type DivDivByZeroResponseBody string
+
+// NewDivDivByZero builds a calc service div endpoint DivByZero error.
+func NewDivDivByZero(body DivDivByZeroResponseBody) calc.DivByZero {
+	v := calc.DivByZero(body)
+
+	return v
+}

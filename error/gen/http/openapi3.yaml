@@ -20,9 +20,9 @@ paths:
         schema:
           type: integer
           description: Left operand
-          example: 1228682945796019344
+          example: 8723986392256123438
           format: int64
-        example: 4886963557863946648
+        example: 9092197569596372935
       - name: b
         in: path
         description: Right operand
@@ -30,9 +30,9 @@ paths:
         schema:
           type: integer
           description: Right operand
-          example: 6642806206162570878
+          example: 2937026320033011362
           format: int64
-        example: 8723986392256123438
+        example: 207017106558923967
       responses:
         "200":
           description: OK response.
@@ -40,17 +40,20 @@ paths:
             application/json:
               schema:
                 type: integer
-                example: 6747375795581831989
+                example: 1016925590796087323
                 format: int64
-              example: 9092197569596372935
+              example: 6001261670528037577
         "400":
           description: Bad Request response.
           content:
             application/json:
               schema:
-                type: string
-                example: Ullam eius odio minima ipsam voluptatem mollitia.
-              example: Alias optio doloremque numquam.
-components: {}
+                $ref: '#/components/schemas/DivByZero'
+              example: Delectus quam.
+components:
+  schemas:
+    DivByZero:
+      type: string
+      example: Mollitia placeat tenetur qui.
 tags:
 - name: calc

@@ -50,7 +50,7 @@ func (c *Client) BuildDivRequest(ctx context.Context, v interface{}) (*http.Requ
 // endpoint. restoreBody controls whether the response body should be restored
 // after having been read.
 // DecodeDivResponse may return the following errors:
-//	- "DivByZero" (type string): http.StatusBadRequest
+//	- "DivByZero" (type calc.DivByZero): http.StatusBadRequest
 //	- error: internal error
 func DecodeDivResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -79,14 +79,14 @@ func DecodeDivResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			return body, nil
 		case http.StatusBadRequest:
 			var (
-				body string
+				body DivDivByZeroResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("calc", "div", err)
 			}
-			return nil, body
+			return nil, NewDivDivByZero(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("calc", "div", resp.StatusCode, string(body))

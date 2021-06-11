@@ -38,6 +38,11 @@ paths:
         "400":
           description: Bad Request response.
           schema:
-            type: string
+            $ref: '#/definitions/CalcDivDivByZeroResponseBody'
       schemes:
       - http
+definitions:
+  CalcDivDivByZeroResponseBody:
+    title: CalcDivDivByZeroResponseBody
+    type: string
+    example: Error ullam eius odio minima.

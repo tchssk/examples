@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"strconv"
 
+	calc "goa.design/examples/error/gen/calc"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -76,9 +77,14 @@ func EncodeDivError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 		}
 		switch en.ErrorName() {
 		case "DivByZero":
-			res := v.(string)
+			res := v.(calc.DivByZero)
 			enc := encoder(ctx, w)
-			body := res
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDivDivByZeroResponseBody(res)
+			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusBadRequest)
 			return enc.Encode(body)
