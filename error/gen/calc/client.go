@@ -16,35 +16,23 @@ import (
 
 // Client is the "calc" service client.
 type Client struct {
-	DivideEndpoint goa.Endpoint
-	AddEndpoint    goa.Endpoint
+	DivEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "calc" service client given the endpoints.
-func NewClient(divide, add goa.Endpoint) *Client {
+func NewClient(div goa.Endpoint) *Client {
 	return &Client{
-		DivideEndpoint: divide,
-		AddEndpoint:    add,
+		DivEndpoint: div,
 	}
 }
 
-// Divide calls the "divide" endpoint of the "calc" service.
-// Divide may return the following errors:
-//	- "div_by_zero" (type *DivByZero): division by 0
+// Div calls the "div" endpoint of the "calc" service.
+// Div may return the following errors:
+//	- "DivByZero" (type *goa.ServiceError)
 //	- error: internal error
-func (c *Client) Divide(ctx context.Context, p *DividePayload) (res *DivideResult, err error) {
+func (c *Client) Div(ctx context.Context, p *DivPayload) (res int, err error) {
 	var ires interface{}
-	ires, err = c.DivideEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*DivideResult), nil
-}
-
-// Add calls the "add" endpoint of the "calc" service.
-func (c *Client) Add(ctx context.Context, p *AddPayload) (res int, err error) {
-	var ires interface{}
-	ires, err = c.AddEndpoint(ctx, p)
+	ires, err = c.DivEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

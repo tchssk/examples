@@ -19,13 +19,25 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
-// BuildDivideRequest instantiates a HTTP request object with method and path
-// set to call the "calc" service "divide" endpoint
-func (c *Client) BuildDivideRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DivideCalcPath()}
-	req, err := http.NewRequest("POST", u.String(), nil)
+// BuildDivRequest instantiates a HTTP request object with method and path set
+// to call the "calc" service "div" endpoint
+func (c *Client) BuildDivRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		a int
+		b int
+	)
+	{
+		p, ok := v.(*calc.DivPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("calc", "div", "*calc.DivPayload", v)
+		}
+		a = p.A
+		b = p.B
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DivCalcPath(a, b)}
+	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
-		return nil, goahttp.ErrInvalidURL("calc", "divide", u.String(), err)
+		return nil, goahttp.ErrInvalidURL("calc", "div", u.String(), err)
 	}
 	if ctx != nil {
 		req = req.WithContext(ctx)
@@ -34,30 +46,13 @@ func (c *Client) BuildDivideRequest(ctx context.Context, v interface{}) (*http.R
 	return req, nil
 }
 
-// EncodeDivideRequest returns an encoder for requests sent to the calc divide
-// server.
-func EncodeDivideRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
-	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*calc.DividePayload)
-		if !ok {
-			return goahttp.ErrInvalidType("calc", "divide", "*calc.DividePayload", v)
-		}
-		body := NewDivideRequestBody(p)
-		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("calc", "divide", err)
-		}
-		return nil
-	}
-}
-
-// DecodeDivideResponse returns a decoder for responses returned by the calc
-// divide endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeDivideResponse may return the following errors:
-//	- "div_by_zero" (type *calc.DivByZero): http.StatusBadRequest
-//	- "timeout" (type *goa.ServiceError): http.StatusGatewayTimeout
+// DecodeDivResponse returns a decoder for responses returned by the calc div
+// endpoint. restoreBody controls whether the response body should be restored
+// after having been read.
+// DecodeDivResponse may return the following errors:
+//	- "DivByZero" (type string): http.StatusBadRequest
 //	- error: internal error
-func DecodeDivideResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+func DecodeDivResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
 			b, err := ioutil.ReadAll(resp.Body)
@@ -74,50 +69,27 @@ func DecodeDivideResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body DivideResponseBody
+				body int
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("calc", "divide", err)
+				return nil, goahttp.ErrDecodingError("calc", "div", err)
 			}
-			err = ValidateDivideResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("calc", "divide", err)
-			}
-			res := NewDivideResultOK(&body)
-			return res, nil
+			return body, nil
 		case http.StatusBadRequest:
 			var (
-				body DivideDivByZeroResponseBody
+				body string
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
-				return nil, goahttp.ErrDecodingError("calc", "divide", err)
+				return nil, goahttp.ErrDecodingError("calc", "div", err)
 			}
-			err = ValidateDivideDivByZeroResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("calc", "divide", err)
-			}
-			return nil, NewDivideDivByZero(&body)
-		case http.StatusGatewayTimeout:
-			var (
-				body DivideTimeoutResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("calc", "divide", err)
-			}
-			err = ValidateDivideTimeoutResponseBody(&body)
-			if err != nil {
-				return nil, goahttp.ErrValidationError("calc", "divide", err)
-			}
-			return nil, NewDivideTimeout(&body)
+			return nil, body
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("calc", "divide", resp.StatusCode, string(body))
+			return nil, goahttp.ErrInvalidResponse("calc", "div", resp.StatusCode, string(body))
 		}
 	}
 }

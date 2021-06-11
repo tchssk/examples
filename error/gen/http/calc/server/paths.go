@@ -8,7 +8,11 @@
 
 package server
 
-// DivideCalcPath returns the URL path to the calc service divide HTTP endpoint.
-func DivideCalcPath() string {
-	return "/"
+import (
+	"fmt"
+)
+
+// DivCalcPath returns the URL path to the calc service div HTTP endpoint.
+func DivCalcPath(a int, b int) string {
+	return fmt.Sprintf("/div/%v/%v", a, b)
 }

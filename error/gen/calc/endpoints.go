@@ -16,38 +16,26 @@ import (
 
 // Endpoints wraps the "calc" service endpoints.
 type Endpoints struct {
-	Divide goa.Endpoint
-	Add    goa.Endpoint
+	Div goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "calc" service with endpoints.
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
-		Divide: NewDivideEndpoint(s),
-		Add:    NewAddEndpoint(s),
+		Div: NewDivEndpoint(s),
 	}
 }
 
 // Use applies the given middleware to all the "calc" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
-	e.Divide = m(e.Divide)
-	e.Add = m(e.Add)
+	e.Div = m(e.Div)
 }
 
-// NewDivideEndpoint returns an endpoint function that calls the method
-// "divide" of service "calc".
-func NewDivideEndpoint(s Service) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*DividePayload)
-		return s.Divide(ctx, p)
-	}
-}
-
-// NewAddEndpoint returns an endpoint function that calls the method "add" of
+// NewDivEndpoint returns an endpoint function that calls the method "div" of
 // service "calc".
-func NewAddEndpoint(s Service) goa.Endpoint {
+func NewDivEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*AddPayload)
-		return s.Add(ctx, p)
+		p := req.(*DivPayload)
+		return s.Div(ctx, p)
 	}
 }

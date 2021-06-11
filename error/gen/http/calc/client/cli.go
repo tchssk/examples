@@ -9,27 +9,36 @@
 package client
 
 import (
-	"encoding/json"
 	"fmt"
+	"strconv"
 
 	calc "goa.design/examples/error/gen/calc"
 )
 
-// BuildDividePayload builds the payload for the calc divide endpoint from CLI
-// flags.
-func BuildDividePayload(calcDivideBody string) (*calc.DividePayload, error) {
+// BuildDivPayload builds the payload for the calc div endpoint from CLI flags.
+func BuildDivPayload(calcDivA string, calcDivB string) (*calc.DivPayload, error) {
 	var err error
-	var body DivideRequestBody
+	var a int
 	{
-		err = json.Unmarshal([]byte(calcDivideBody), &body)
+		var v int64
+		v, err = strconv.ParseInt(calcDivA, 10, 64)
+		a = int(v)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"dividend\": 6322633713974661021,\n      \"divisor\": 3793862871819669726\n   }'")
+			return nil, fmt.Errorf("invalid value for a, must be INT")
 		}
 	}
-	v := &calc.DividePayload{
-		Dividend: body.Dividend,
-		Divisor:  body.Divisor,
+	var b int
+	{
+		var v int64
+		v, err = strconv.ParseInt(calcDivB, 10, 64)
+		b = int(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for b, must be INT")
+		}
 	}
+	v := &calc.DivPayload{}
+	v.A = a
+	v.B = b
 
 	return v, nil
 }

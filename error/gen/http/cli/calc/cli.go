@@ -24,16 +24,13 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `calc divide
+	return `calc div
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` calc divide --body '{
-      "dividend": 6322633713974661021,
-      "divisor": 3793862871819669726
-   }'` + "\n" +
+	return os.Args[0] + ` calc div --a 5952269320165453119 --b 1828520165265779840` + "\n" +
 		""
 }
 
@@ -49,11 +46,12 @@ func ParseEndpoint(
 	var (
 		calcFlags = flag.NewFlagSet("calc", flag.ContinueOnError)
 
-		calcDivideFlags    = flag.NewFlagSet("divide", flag.ExitOnError)
-		calcDivideBodyFlag = calcDivideFlags.String("body", "REQUIRED", "")
+		calcDivFlags = flag.NewFlagSet("div", flag.ExitOnError)
+		calcDivAFlag = calcDivFlags.String("a", "REQUIRED", "Left operand")
+		calcDivBFlag = calcDivFlags.String("b", "REQUIRED", "Right operand")
 	)
 	calcFlags.Usage = calcUsage
-	calcDivideFlags.Usage = calcDivideUsage
+	calcDivFlags.Usage = calcDivUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -89,8 +87,8 @@ func ParseEndpoint(
 		switch svcn {
 		case "calc":
 			switch epn {
-			case "divide":
-				epf = calcDivideFlags
+			case "div":
+				epf = calcDivFlags
 
 			}
 
@@ -117,9 +115,9 @@ func ParseEndpoint(
 		case "calc":
 			c := calcc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
-			case "divide":
-				endpoint = c.Divide()
-				data, err = calcc.BuildDividePayload(*calcDivideBodyFlag)
+			case "div":
+				endpoint = c.Div()
+				data, err = calcc.BuildDivPayload(*calcDivAFlag, *calcDivBFlag)
 			}
 		}
 	}
@@ -137,22 +135,20 @@ Usage:
     %s [globalflags] calc COMMAND [flags]
 
 COMMAND:
-    divide: Divide implements divide.
+    div: Div implements div.
 
 Additional help:
     %s calc COMMAND --help
 `, os.Args[0], os.Args[0])
 }
-func calcDivideUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] calc divide -body JSON
+func calcDivUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] calc div -a INT -b INT
 
-Divide implements divide.
-    -body JSON: 
+Div implements div.
+    -a INT: Left operand
+    -b INT: Right operand
 
 Example:
-    `+os.Args[0]+` calc divide --body '{
-      "dividend": 6322633713974661021,
-      "divisor": 3793862871819669726
-   }'
+    `+os.Args[0]+` calc div --a 5952269320165453119 --b 1828520165265779840
 `, os.Args[0])
 }

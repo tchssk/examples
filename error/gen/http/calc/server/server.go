@@ -20,7 +20,7 @@ import (
 // Server lists the calc service endpoint HTTP handlers.
 type Server struct {
 	Mounts []*MountPoint
-	Divide http.Handler
+	Div    http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -56,9 +56,9 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"Divide", "POST", "/"},
+			{"Div", "GET", "/div/{a}/{b}"},
 		},
-		Divide: NewDivideHandler(e.Divide, mux, decoder, encoder, errhandler, formatter),
+		Div: NewDivHandler(e.Div, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -67,29 +67,29 @@ func (s *Server) Service() string { return "calc" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
-	s.Divide = m(s.Divide)
+	s.Div = m(s.Div)
 }
 
 // Mount configures the mux to serve the calc endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
-	MountDivideHandler(mux, h.Divide)
+	MountDivHandler(mux, h.Div)
 }
 
-// MountDivideHandler configures the mux to serve the "calc" service "divide"
+// MountDivHandler configures the mux to serve the "calc" service "div"
 // endpoint.
-func MountDivideHandler(mux goahttp.Muxer, h http.Handler) {
+func MountDivHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/", f)
+	mux.Handle("GET", "/div/{a}/{b}", f)
 }
 
-// NewDivideHandler creates a HTTP handler which loads the HTTP request and
-// calls the "calc" service "divide" endpoint.
-func NewDivideHandler(
+// NewDivHandler creates a HTTP handler which loads the HTTP request and calls
+// the "calc" service "div" endpoint.
+func NewDivHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -98,13 +98,13 @@ func NewDivideHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeDivideRequest(mux, decoder)
-		encodeResponse = EncodeDivideResponse(encoder)
-		encodeError    = EncodeDivideError(encoder, formatter)
+		decodeRequest  = DecodeDivRequest(mux, decoder)
+		encodeResponse = EncodeDivResponse(encoder)
+		encodeError    = EncodeDivError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "divide")
+		ctx = context.WithValue(ctx, goa.MethodKey, "div")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "calc")
 		payload, err := decodeRequest(r)
 		if err != nil {
